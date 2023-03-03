@@ -10,7 +10,8 @@ dotnet run
 
 ```
 
-or 
+or
+
 ```powershell
 dotnet run --project .\ReadReg.csproj
 ```

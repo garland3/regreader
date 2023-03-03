@@ -13,7 +13,10 @@ class Program
         string csvFilePath = "output.csv";
 
         // Get the root key for HKEY_CLASSES_ROOT
-        RegistryKey rootKey = Registry.ClassesRoot;
+        // RegistryKey rootKey = Registry.ClassesRoot;
+
+        // Get the root key for the local machine registry hive
+        RegistryKey rootKey = Registry.LocalMachine;
 
         // Create a list to store the results
         List<KeyValuePair<string, object>> results = new List<KeyValuePair<string, object>>();
@@ -40,12 +43,19 @@ class Program
         // Recursively search all subkeys
         foreach (string subKeyName in key.GetSubKeyNames())
         {
-            using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+            try
             {
-                if (subKey != null)
+                using (RegistryKey subKey = key.OpenSubKey(subKeyName))
                 {
-                    SearchRegistryKeys(subKey, searchTerm, results);
+                    if (subKey != null)
+                    {
+                        SearchRegistryKeys(subKey, searchTerm, results);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message+ "For key: " + subKeyName);
             }
         }
     }
@@ -64,43 +74,3 @@ class Program
         }
     }
 }
-
-// using Microsoft.Win32;
-// // include console
-// using System;
-
-// class Program
-// {
-//     static void Main(string[] args)
-//     {
-//         // Open the SolidWorks key in the registry
-//         // RegistryKey solidWorksKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\SolidWorks");
-//         RegistryKey solidWorksKey = Registry.CurrentUser.OpenSubKey("Software\\SolidWorks");
-
-
-//         if (solidWorksKey != null)
-//         {
-//             foreach (string subKeyName in solidWorksKey.GetSubKeyNames())
-//             {
-//                 using (RegistryKey subKey = solidWorksKey.OpenSubKey(subKeyName))
-//                 {
-//                     string versionString = subKey?.GetValue("Version")?.ToString();
-//                     if (!string.IsNullOrEmpty(versionString))
-//                     {
-//                         Version version = new Version(versionString);
-//                         Console.WriteLine($"SolidWorks version found in subkey {subKeyName}: {version}");
-//                     }
-//                 }
-//             }
-//         }
-//         else
-//         {
-//             // Output an error message to the console
-//             Console.WriteLine("SolidWorks is not installed");
-//         }
-
-//         // Wait for the user to press a key before exiting
-//         Console.WriteLine("Press any key to exit...");
-//         Console.ReadKey();
-//     }
-// }
